@@ -1,0 +1,87 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../app"
+		}
+	],
+	"settings": {
+		"editor.wordWrap": "on",
+		"editor.formatOnSave": true,
+		"editor.rulers": [
+			100
+		],
+		"python.defaultInterpreterPath": "${workspaceFolder}/app/.venv/bin/python",
+		"python.testing.pytestArgs": [
+			"--no-cov"
+		],
+		"python.testing.pytestEnabled": true,
+		"python.linting.flake8Enabled": false,
+		"python.linting.enabled": false,
+		"pythonTestExplorer.testFramework": "pytest",
+		"pythonTestExplorer.testplanEnabled": false,
+		"ruff.importStrategy": "fromEnvironment",
+		"ruff.args": [
+			"--unfixable",
+			"T20,ERA001"
+		],
+		"[python]": {
+			"editor.formatOnSave": true,
+			"editor.defaultFormatter": "charliermarsh.ruff"
+		},
+		"python.languageServer": "Pylance",
+		"python.analysis.typeCheckingMode": "basic",
+		"python.analysis.useLibraryCodeForTypes": true,
+		"python.analysis.indexing": true,
+		"python.analysis.autoImportCompletions": true,
+		"python.analysis.autoImportUserSymbols": true,
+		"python.analysis.completeFunctionParens": true,
+		"python.analysis.diagnosticMode": "workspace",
+		"python.analysis.ignore": [
+			"**/.venv",
+			"**/.__pycache__",
+		],
+		"python.analysis.diagnosticSeverityOverrides": {
+			"reportCallInDefaultInitializer": "warning",
+			"reportMatchNotExhaustive": "warning",
+			"reportMissingSuperCall": "warning",
+			"reportOverlappingOverload": "warning",
+			"reportUninitializedInstanceVariable": "none",
+			"reportUnnecessaryCast": "warning",
+			"reportUnnecessaryTypeIgnoreComment": "warning",
+			"reportUntypedNamedTuple": "error",
+			"reportUnusedExpression": "warning",
+			"reportUnnecessaryComparison": "warning",
+			"reportUnnecessaryContains": "warning",
+			"reportUnnecessaryIsInstance": "warning",
+			"reportShadowedImports": "warning",
+			"strictDictionaryInference": true,
+			"strictListInference": true,
+			"strictSetInference": true
+		},
+		"[json]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"[javascript]": {
+			"editor.defaultFormatter": "esbenp.prettier-vscode"
+		},
+		"i18n-ally.localesPaths": [
+			"backend/locale"
+		],
+	},
+	"extensions": {
+		"recommendations": [
+			"editorconfig.editorconfig",
+			"esbenp.prettier-vscode",
+			"littlefoxteam.vscode-python-test-adapter",
+			"ms-python.python",
+			"ms-python.vscode-pylance",
+			"charliermarsh.ruff",
+			"redhat.vscode-yaml",
+			"streetsidesoftware.code-spell-checker",
+			"streetsidesoftware.code-spell-checker-portuguese-brazilian"
+		],
+	},
+}
