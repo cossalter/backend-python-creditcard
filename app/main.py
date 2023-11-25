@@ -1,8 +1,7 @@
+import routers
 from fastapi import FastAPI
 
 app = FastAPI()
 
-
-@app.get("/")
-def hello_word():
-    return {"Hello": "Word"}
+for router in routers.all_router:
+    app.include_router(router)
