@@ -1,8 +1,19 @@
+from fastapi import status, HTTPException
 from pydantic import BaseModel, Field
 
 from base.router import BaseAPIRouter
+from credit_card.factory import CreditCardFactory
+from credit_card.entity import CreditCard
 
 router = BaseAPIRouter(prefix="/credit-card", tags=["credit-card"])
+
+
+def serializer(creditcard: CreditCard) -> dict:
+    return {
+        **creditcard.to_dict(),
+        "exp_date": creditcard.exp_date.strftime("%m/%Y"),
+    }
+
 
 # POST
 
@@ -21,4 +32,10 @@ class CreateCardInput(BaseModel):
 
 @router.post("/")
 async def create(input: CreateCardInput):
-    return input
+    try:
+        card = CreditCardFactory.create(**input.model_dump())
+
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return serializer(card)
