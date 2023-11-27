@@ -1,3 +1,6 @@
+run-tests:
+	@cd app && poetry run pytest -vvv
+
 run-local:
 	@cd app && poetry run uvicorn main:app --host 0.0.0.0 --port 3000 --reload
 
