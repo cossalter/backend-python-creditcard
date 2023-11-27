@@ -3,23 +3,19 @@ from datetime import datetime, timedelta
 from typing import Annotated, Any, TypeAlias
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
+from sqlalchemy.orm import Session
+
 from user.entity import User
 from base.router import BaseAPIRouter
 
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "doc": "55770790040",
-        "birthday": "1998-11-20",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "is_active": True,
-    }
-}
+from database.user.model import get_user
+from database.base import get_db
+
 
 router = BaseAPIRouter(prefix="/token", tags=["token"])
 
@@ -57,17 +53,12 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return User(**user_dict)
+def authenticate_user(db: Session, username: str, password: str):
+    user = get_user(db, username)
 
-
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -83,7 +74,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encode(to_encode)
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -97,7 +90,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+
+    user = get_user(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -115,10 +109,8 @@ CurrentUser: TypeAlias = Annotated[User, Depends(get_current_active_user)]
 
 
 @router.post("/", response_model=Token)
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-):
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+async def login(username: str, password: str, db: Session = Depends(get_db)):
+    user = authenticate_user(db, username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -132,4 +124,4 @@ async def login_for_access_token(
         data={"sub": user.username},
         expires_delta=access_token_expires,
     )
-    return {"access_token": access_token, "type": "Bearer"}
+    return {"access_token": access_token, "token_type": "Bearer"}

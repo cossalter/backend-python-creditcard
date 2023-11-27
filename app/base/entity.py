@@ -1,8 +1,17 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 
 @dataclass
 class BaseEntity:
+    _id: str | None = field(init=False, default=None)
+
+    @property
+    def id(self) -> str | None:
+        return self._id
+
+    def set_id(self, id: str):
+        self._id = id
+
     def __init__(self, **kwargs) -> None:
         for arg in kwargs:
             setattr(self, arg, kwargs[arg])
