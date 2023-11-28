@@ -24,9 +24,6 @@ RUN apt-get update \
     && apt-get clean \
     && apt-get autoremove --purge -y
 
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-RUN sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen
-
 COPY pyproject.toml .
 COPY poetry.lock .
 RUN pip install -U pip wheel poetry \

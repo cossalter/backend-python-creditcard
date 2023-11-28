@@ -18,7 +18,7 @@ DATABASE_URL_CONNECTION=
 
 4. **`DATABASE_URL_CONNECTION`**: será a URL de conexão com o seu banco de dados preferido (no meu caso, utilizei o sqlite3 o tempo todo);
 
-## Rodando as coisas
+## Executanto
 
 Agora podemos executar alguns comandos que estão no arquivo `Makefile`
 
@@ -29,6 +29,8 @@ Agora podemos executar alguns comandos que estão no arquivo `Makefile`
 2. **`run-local`**: facilitará nossas vidas e permitirá que rodemos a aplicação do diretório `root` do projeto.
 
 3. **`run-tests`**: executará toda a suíte de testes desenvolvida até agora.
+
+**OBS**: Caso não goste de criar local environment você pode executar o projeto utilizando `Docker` ou `docker-composer`.
 
 ## Curiosidade
 
