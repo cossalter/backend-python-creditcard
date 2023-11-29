@@ -19,7 +19,7 @@ class User(Base):
 
 
 def _model2entity(user_model: CreditCard) -> "UserEntity":
-    from user.entity import User as UserEntity
+    from entities.user import User as UserEntity
 
     user = UserEntity(
         username=user_model.username,
@@ -40,7 +40,7 @@ def get_user(db: Session, username: str) -> "UserEntity | None":
 
 
 def create_user(db: Session, user: "UserEntity") -> "UserEntity":
-    from routers.auth import get_password_hash
+    from base.utils import get_password_hash
 
     db_user = User(
         username=user.username,
