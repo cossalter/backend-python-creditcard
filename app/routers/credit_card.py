@@ -8,7 +8,7 @@ from entities.factories.credit_card import CreditCardFactory
 from entities.credit_card import CreditCard
 
 from database.base import get_db
-from database.credit_card.model import create_credit_card, get_cards, get_card
+from database.models.credit_card import create_credit_card, get_cards, get_card
 
 from routers.auth import CurrentUser
 

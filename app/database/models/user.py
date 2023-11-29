@@ -1,13 +1,11 @@
-import datetime
-
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
-from database.credit_card.model import CreditCard
+from app.database.models.credit_card import CreditCard
 
 from database.base import Base
 
 if TYPE_CHECKING:
-    from user.entity import User as UserEntity
+    from entities.user import User as UserEntity
 
 
 class User(Base):

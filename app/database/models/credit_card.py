@@ -9,7 +9,7 @@ from database.base import Base
 from base.utils import base64_decode, base64_encode
 
 if TYPE_CHECKING:
-    from credit_card.entity import CreditCard as CreditCardEntity
+    from entities.credit_card import CreditCard as CreditCardEntity
 
 
 class CreditCard(Base):
@@ -29,7 +29,7 @@ class CreditCard(Base):
 
 
 def _model2entity(card_model: CreditCard) -> "CreditCardEntity":
-    from credit_card.entity import CreditCard as CreditCardEntity
+    from app.entities.credit_card import CreditCard as CreditCardEntity
 
     card = CreditCardEntity(
         exp_date=card_model.exp_date,
@@ -44,7 +44,7 @@ def _model2entity(card_model: CreditCard) -> "CreditCardEntity":
 
 
 def get_card(db: Session, user_id: int, card_id: int) -> "CreditCardEntity | None":
-    from database.user.model import User
+    from database.models.user import User
 
     card = (
         db.query(CreditCard).where(CreditCard.id == card_id, User.id == user_id).first()
@@ -55,7 +55,7 @@ def get_card(db: Session, user_id: int, card_id: int) -> "CreditCardEntity | Non
 
 
 def get_cards(db: Session, user_id: int) -> list["CreditCardEntity"]:
-    from database.user.model import User
+    from database.models.user import User
 
     user = db.query(User).where(User.id == user_id).first()
 
