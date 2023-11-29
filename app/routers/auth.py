@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from sqlalchemy.orm import Session
 
-from user.entity import User
+from entities.user import User
 from base.router import BaseAPIRouter
 
 from database.user.model import get_user

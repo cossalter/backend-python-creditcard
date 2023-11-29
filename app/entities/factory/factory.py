@@ -1,7 +1,7 @@
 import datetime
 import calendar
 
-from credit_card.entity import CreditCard
+from entities.credit_card import CreditCard
 
 
 class CreditCardFactory:

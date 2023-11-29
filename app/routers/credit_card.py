@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 
 from base.router import BaseAPIRouter
 
-from credit_card.factory import CreditCardFactory
-from credit_card.entity import CreditCard
+from entities.factory.factory import CreditCardFactory
+from entities.credit_card import CreditCard
 
 from database.base import get_db
 from database.credit_card.model import create_credit_card, get_cards, get_card

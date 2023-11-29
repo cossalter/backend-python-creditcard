@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from user.entity import User
+from entities.user import User
 from routers.auth import CurrentUser
 from base.router import BaseAPIRouter
 
