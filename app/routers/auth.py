@@ -1,77 +1,38 @@
 import os
-from datetime import datetime, timedelta
-from typing import Annotated, Any, TypeAlias
+from datetime import timedelta
+from typing import Annotated, TypeAlias
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from pydantic import BaseModel
+
 
 from sqlalchemy.orm import Session
 
 from entities.user import User
 from base.router import BaseAPIRouter
 
-from database.user.model import get_user
+from database.models.user import get_user
 from database.base import get_db
+
+from jose import JWTError
+from base.utils import verify_password
+from auth.jwt import (
+    Token,
+    TokenData,
+    create_access_token,
+    get_data_from_token,
+    oauth2_scheme,
+)
 
 
 router = BaseAPIRouter(prefix="/token", tags=["token"])
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str | None = None
-
-
-def encode(data: Any) -> str:
-    return jwt.encode(
-        data, os.getenv("JWT_SECRET_KEY"), algorithm=os.getenv("JWT_ALGORITHM")
-    )
-
-
-def decode(token) -> dict[str, Any]:
-    return jwt.decode(
-        token, os.getenv("JWT_SECRET_KEY"), algorithms=[os.getenv("JWT_ALGORITHM")]
-    )
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
 
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
+    if not user or not verify_password(password, user.password):
+        return False
 
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
     return user
-
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-
-    return encode(to_encode)
 
 
 async def get_current_user(
@@ -83,7 +44,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = decode(token)
+        payload = get_data_from_token(token)
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
