@@ -20,12 +20,7 @@ class CreditCard(Base):
     exp_date: Mapped[datetime.date] = mapped_column(nullable=False)
     cvv: Mapped[int] = mapped_column(nullable=True)
 
-    user_id = Column(
-        "user_id",
-        ForeignKey("users.id"),
-        back_populates="cards",
-        nullable=True,
-    )
+    user_id = Column("user_id", ForeignKey("users.id"), nullable=True)
 
 
 def _model2entity(card_model: CreditCard) -> "CreditCardEntity":
