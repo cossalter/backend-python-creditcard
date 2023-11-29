@@ -7,7 +7,7 @@ from routers.auth import CurrentUser
 from base.router import BaseAPIRouter
 
 from database.base import get_db
-from database.user.model import create_user, get_user
+from database.models.user import create_user, get_user
 
 
 router = BaseAPIRouter(prefix="/users", tags=["user"])
