@@ -1,22 +1,19 @@
-import routers
+from routers import all_router
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from database.base import Base, engine
 
 
-class BaseFastAPI(FastAPI):
-    def setup(self) -> None:
-        # setup environment variable
-        load_dotenv()
+def on_startup():
+    # setup environment variable
+    load_dotenv()
 
-        # setup database
-        Base.metadata.create_all(bind=engine)
-
-        super().setup()
+    # setup database
+    Base.metadata.create_all(bind=engine)
 
 
-app = BaseFastAPI()
+app = FastAPI(on_startup=[on_startup])
 
-for router in routers.all_router:
+for router in all_router:
     app.include_router(router)
