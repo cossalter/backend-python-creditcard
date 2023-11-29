@@ -2,7 +2,7 @@ import pytest
 import datetime
 from freezegun import freeze_time
 
-from app.credit_card.entity import CreditCard
+from entities.credit_card import CreditCard
 
 
 class TestCreditCard:

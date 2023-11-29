@@ -1,4 +1,4 @@
-from user.entity import User
+from entities.user import User
 
 
 class TestUserEntity:

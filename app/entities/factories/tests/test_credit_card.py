@@ -1,8 +1,8 @@
 import datetime
 from freezegun import freeze_time
 
-from app.credit_card.factory import CreditCardFactory
-from app.credit_card.entity import CreditCard
+from entities.factories.credit_card import CreditCardFactory
+from entities.credit_card import CreditCard
 
 
 class TestCreditCardFactory:
