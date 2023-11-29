@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
-from app.database.models.credit_card import CreditCard
 
 from database.base import Base
+from database.models.credit_card import CreditCard
 
 if TYPE_CHECKING:
     from entities.user import User as UserEntity
