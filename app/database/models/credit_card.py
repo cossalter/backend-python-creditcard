@@ -1,3 +1,4 @@
+import os
 import datetime
 
 from typing import TYPE_CHECKING
@@ -6,10 +7,21 @@ from sqlalchemy import ForeignKey, Column
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from database.base import Base
-from base.utils import base64_decode, base64_encode
+
+from cryptography.fernet import Fernet
+
+_fernet = Fernet(os.getenv("CREDITCARD_ENCRYPT_KEY"))
 
 if TYPE_CHECKING:
     from entities.credit_card import CreditCard as CreditCardEntity
+
+
+def encoded(text: str) -> str:
+    return _fernet.encrypt(text.encode())
+
+
+def decoded(text: str) -> str:
+    return _fernet.decrypt(text).decode()
 
 
 class CreditCard(Base):
@@ -29,7 +41,7 @@ def _model2entity(card_model: CreditCard) -> "CreditCardEntity":
     card = CreditCardEntity(
         exp_date=card_model.exp_date,
         holder=card_model.holder,
-        number=base64_decode(card_model.number),
+        number=decoded(card_model.number),
         cvv=card_model.cvv,
     )
 
@@ -65,7 +77,7 @@ def create_credit_card(
     db_card = CreditCard(
         exp_date=card.exp_date,
         holder=card.holder,
-        number=base64_encode(card.number),
+        number=encoded(card.number),
         cvv=card.cvv,
         user_id=user_id,
     )

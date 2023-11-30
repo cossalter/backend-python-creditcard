@@ -16,7 +16,9 @@ DATABASE_URL_CONNECTION=
 
 3. **`JWT_ACCESS_TOKEN_EXPIRE_MINUTES`**: esta variável define o tempo em que o token expirará em minutos, sendo o seu valor um número inteiro positivo;
 
-4. **`DATABASE_URL_CONNECTION`**: será a URL de conexão com o seu banco de dados preferido (no meu caso, utilizei o sqlite3 o tempo todo);
+4. **`CREDITCARD_ENCRYPT_KEY`**: será a chave gerada pelo comando `openssl rand -base64 32` e depois a string precisa ser transformando em bytes. ex: b'\<YOUR-GENERATED-KEY\>';
+
+5. **`DATABASE_URL_CONNECTION`**: será a URL de conexão com o seu banco de dados preferido (no meu caso, utilizei o sqlite3 o tempo todo);
 
 ## Executanto
 
