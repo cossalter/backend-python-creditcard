@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database.base import Base
+from database.base import BaseModel
 
 client = TestClient(app)
 
@@ -20,7 +20,7 @@ def _create_db_session():
     )
     session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-    Base.metadata.create_all(bind=engine)
+    BaseModel.metadata.create_all(bind=engine)
 
     return session
 

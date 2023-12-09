@@ -2,7 +2,7 @@ from routers import all_router
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from database.base import Base, engine
+from database.base import BaseModel, engine
 
 
 def on_startup():
@@ -10,7 +10,7 @@ def on_startup():
     load_dotenv()
 
     # setup database
-    Base.metadata.create_all(bind=engine)
+    BaseModel.metadata.create_all(bind=engine)
 
 
 app = FastAPI(on_startup=[on_startup])

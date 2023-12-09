@@ -1,30 +1,18 @@
-import os
 import datetime
+from base.utils import encrypt, decrypt
 
-from typing import TYPE_CHECKING
+from database.base import BaseModel
+
+from typing import Self
 
 from sqlalchemy import ForeignKey, Column
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from database.base import Base
-
-from cryptography.fernet import Fernet
-
-_fernet = Fernet(os.getenv("CREDITCARD_ENCRYPT_KEY"))
-
-if TYPE_CHECKING:
-    from entities.credit_card import CreditCard as CreditCardEntity
+from entities.user import User
+from entities.credit_card import CreditCard
 
 
-def encoded(text: str) -> str:
-    return _fernet.encrypt(text.encode())
-
-
-def decoded(text: str) -> str:
-    return _fernet.decrypt(text).decode()
-
-
-class CreditCard(Base):
+class CreditCardModel(BaseModel):
     __tablename__ = "credit_cards"
 
     holder: Mapped[str] = mapped_column(nullable=False)
@@ -34,55 +22,29 @@ class CreditCard(Base):
 
     user_id = Column("user_id", ForeignKey("users.id"), nullable=True)
 
+    @classmethod
+    def create(
+        cls,
+        db: Session,
+        card: CreditCard,
+        *,
+        user: User | None = None,
+        commit: bool = True,
+    ) -> Self:
+        card_model = cls(
+            exp_date=card.exp_date,
+            holder=card.holder,
+            number=encrypt(card.number),
+            cvv=card.cvv,
+            user_id=user and user.id,
+        )
 
-def _model2entity(card_model: CreditCard) -> "CreditCardEntity":
-    from app.entities.credit_card import CreditCard as CreditCardEntity
+        return card_model.save(db, commit)
 
-    card = CreditCardEntity(
-        exp_date=card_model.exp_date,
-        holder=card_model.holder,
-        number=decoded(card_model.number),
-        cvv=card_model.cvv,
-    )
-
-    card.set_id(card_model.id)
-
-    return card
-
-
-def get_card(db: Session, user_id: int, card_id: int) -> "CreditCardEntity | None":
-    from database.models.user import User
-
-    card = (
-        db.query(CreditCard).where(CreditCard.id == card_id, User.id == user_id).first()
-    )
-
-    if card:
-        return _model2entity(card)
-
-
-def get_cards(db: Session, user_id: int) -> list["CreditCardEntity"]:
-    from database.models.user import User
-
-    user = db.query(User).where(User.id == user_id).first()
-
-    return [_model2entity(card) for card in user.cards]
-
-
-def create_credit_card(
-    db: Session,
-    card: "CreditCardEntity",
-    user_id: int,
-) -> "CreditCardEntity":
-    db_card = CreditCard(
-        exp_date=card.exp_date,
-        holder=card.holder,
-        number=encoded(card.number),
-        cvv=card.cvv,
-        user_id=user_id,
-    )
-    db.add(db_card)
-    db.commit()
-    db.refresh(db_card)
-
-    return _model2entity(db_card)
+    def to_entinty(self) -> CreditCard:
+        return CreditCard(
+            exp_date=self.exp_date,
+            holder=self.holder,
+            number=decrypt(self.number),
+            cvv=self.cvv,
+        )

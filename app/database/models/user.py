@@ -1,54 +1,52 @@
-from typing import TYPE_CHECKING
-from sqlalchemy.orm import Mapped, mapped_column, relationship, Session
+from base.utils import get_password_hash
+from database.base import BaseModel
 
-from database.base import Base
-from database.models.credit_card import CreditCard
+from database.models.credit_card import CreditCardModel
+
+from typing import TYPE_CHECKING, Self
+from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+from sqlalchemy.orm.query import Query
 
 if TYPE_CHECKING:
-    from entities.user import User as UserEntity
+    from entities.user import User
 
 
-class User(Base):
+class UserModel(BaseModel):
     __tablename__ = "users"
 
     username: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    cards = relationship("CreditCard", foreign_keys=[CreditCard.user_id])
-
-
-def _model2entity(user_model: CreditCard) -> "UserEntity":
-    from entities.user import User as UserEntity
-
-    user = UserEntity(
-        username=user_model.username,
-        password=user_model.password,
-        is_active=user_model.is_active,
+    cards: Mapped[list[CreditCardModel]] = relationship(
+        foreign_keys=[CreditCardModel.user_id]
     )
 
-    user.set_id(user_model.id)
+    @classmethod
+    def create(
+        cls,
+        db: Session,
+        user: "User",
+        password: str,
+        *,
+        commit: bool = True,
+    ) -> Self:
+        user_model = cls(
+            username=user.username,
+            is_active=user.is_active,
+            password=get_password_hash(password),
+        )
 
-    return user
+        return user_model.save(db, commit)
 
 
-def get_user(db: Session, username: str) -> "UserEntity | None":
-    db_user = db.query(User).where(User.username == username).first()
+def get_user(
+    db: Session,
+    user: "User",
+    *,
+    query: Query[UserModel] = None,
+) -> UserModel | None:
+    if query is None:
+        query = db.query(UserModel)
 
-    if db_user:
-        return _model2entity(db_user)
-
-
-def create_user(db: Session, user: "UserEntity") -> "UserEntity":
-    from base.utils import get_password_hash
-
-    db_user = User(
-        username=user.username,
-        password=get_password_hash(user.password),
-        is_active=user.is_active,
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-
-    return _model2entity(db_user)
+    return query.where(UserModel.username == user.username).first()
