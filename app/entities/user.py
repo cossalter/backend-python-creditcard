@@ -1,16 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from base.entity import BaseEntity
+
+from entities.credit_card import CreditCard
 
 
 @dataclass
 class User(BaseEntity):
     username: str
-    password: str
     is_active: bool
-
-    def confirm_password(self, password: str) -> bool:
-        return self.password == password
+    cards: list[CreditCard] = field(init=False, default_factory=list)
 
     def validation(self) -> None:
         pass
+
+    def add_card(self, card: CreditCard) -> None:
+        self.cards.append(card)
