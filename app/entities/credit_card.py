@@ -13,7 +13,14 @@ from typing import Self
 DATE_FORMAT = "[0-1][0-9]/[0-9]{4}"
 
 
-def get_last_day(month: int, year: int) -> int:
+def _get_month_year_from_str_date(date: str) -> tuple[int, int]:
+    if not re.fullmatch(DATE_FORMAT, date):
+        raise ValueError("The date parameter must be in the following format %m/%Y")
+
+    return map(int, date.split("/", maxsplit=1))
+
+
+def _get_last_day(month: int, year: int) -> int:
     return calendar.monthrange(year, month)[1]
 
 
@@ -36,22 +43,13 @@ class CreditCard(BaseEntity):
             raise ValueError("Expiration date must be a future date!")
 
         # the day in expiration date must be the last one in the month
-        if self.exp_date.day != get_last_day(self.exp_date.month, self.exp_date.year):
+        if self.exp_date.day != _get_last_day(self.exp_date.month, self.exp_date.year):
             raise ValueError(
                 "The day in expiration date must be the last one in the month!"
             )
 
         if not NumberInfo(self.number).is_valid():
             raise ValueError("The card number isn't valid!")
-
-    @classmethod
-    def get_month_year_from_str_exp_date(cls, exp_date: str) -> tuple[int, int]:
-        if not re.fullmatch(DATE_FORMAT, exp_date):
-            raise ValueError(
-                "The exp_date parameter must be in the following format %m/%Y"
-            )
-
-        return map(int, exp_date.split("/", maxsplit=1))
 
     @classmethod
     def create(
@@ -62,7 +60,7 @@ class CreditCard(BaseEntity):
         cvv: int | None = None,
     ) -> Self:
         if isinstance(exp_date, str):
-            month, year = cls.get_month_year_from_str_exp_date(exp_date)
-            exp_date = datetime.date(year, month, get_last_day(month, year))
+            month, year = _get_month_year_from_str_date(exp_date)
+            exp_date = datetime.date(year, month, _get_last_day(month, year))
 
         return cls(exp_date, holder, number, cvv)
