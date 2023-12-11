@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from entities.user import User
 
-from database.models.user import UserModel, get_user
+from database.models.user import UserModel
 from base.utils import verify_password
 
 
@@ -26,13 +26,13 @@ class TestUserModel:
         UserModel.create(db_session, user1, "foobar")
         UserModel.create(db_session, user2, "bean")
 
-        user_model1 = get_user(db_session, user1)
+        user_model1 = UserModel.get(db_session, username=user1.username)
         assert user_model1 is not None
         assert user_model1.username == "fulaninho"
         assert verify_password("foobar", user_model1.password)
         assert user_model1.is_active is True
 
-        user_model2 = get_user(db_session, user2)
+        user_model2 = UserModel.get(db_session, username=user2.username)
         assert user_model2 is not None
         assert user_model2.username == "ciclano"
         assert verify_password("bean", user_model2.password)

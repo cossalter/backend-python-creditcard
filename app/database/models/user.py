@@ -38,15 +38,3 @@ class UserModel(BaseModel):
         )
 
         return user_model.save(db, commit)
-
-
-def get_user(
-    db: Session,
-    user: "User",
-    *,
-    query: Query[UserModel] = None,
-) -> UserModel | None:
-    if query is None:
-        query = db.query(UserModel)
-
-    return query.where(UserModel.username == user.username).first()
